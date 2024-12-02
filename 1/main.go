@@ -68,18 +68,44 @@ func mergeSort(list []int) []int {
     return mergeSortedLists(mergeSort(l1), mergeSort(l2))
 }
 
+func computeSimilarity(list1 []int, list2[]int) (int, error) {
+    simMap := map[int]int{}
+    countsMap := map[int]int{}
+    for _, val := range list1 {
+        simMap[val] = 0
+    }
+    for _, val := range list2 {
+        _, valExists := countsMap[val]
+        if valExists {
+            countsMap[val] += 1 
+        } else {
+            countsMap[val] = 1 
+        }
+    }
+    similarity := 0
+    for _, val := range list1 {
+        count, valExists := countsMap[val]
+        if valExists {
+            similarity += count*val
+        }
+    }
+
+    return similarity, nil
+
+}
+
 func main() {
-   input, inputErr := os.Open("input")
-   if inputErr != nil{
-       panic(inputErr)
-   }
-   defer input.Close()
-   input_scanner := bufio.NewScanner(input)
+    input, inputErr := os.Open("input")
+    if inputErr != nil{
+        panic(inputErr)
+    }
+    defer input.Close()
+    input_scanner := bufio.NewScanner(input)
 
-   inputA := make([]int, 0)
-   inputB := make([]int, 0)
+    inputA := make([]int, 0)
+    inputB := make([]int, 0)
 
-   for input_scanner.Scan() {
+    for input_scanner.Scan() {
        lineVals := strings.Fields(input_scanner.Text())
 
         lv_a, err_a := strconv.Atoi(lineVals[0])
@@ -92,12 +118,18 @@ func main() {
             panic(err_b)
         }
 
-       inputA = append(inputA, lv_a)
-       inputB = append(inputB, lv_b)
-   }
-   distance, distErr := computeDistance(mergeSort(inputA), mergeSort(inputB))
+        inputA = append(inputA, lv_a)
+        inputB = append(inputB, lv_b)
+    }
+    distance, distErr := computeDistance(mergeSort(inputA), mergeSort(inputB))
     if distErr != nil {
         panic(distErr)
     }
     fmt.Println(distance)
+    similarity, simErr :=  computeSimilarity(inputA, inputB)
+    if simErr != nil {
+        panic(simErr)
+    }
+    fmt.Println(similarity)
+
 }
